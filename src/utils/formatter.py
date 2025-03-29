@@ -1,5 +1,6 @@
 import re
 from utils import Analyzer
+from constants import PRODUCT_FIELDS, CATALOG_URL_PATTERN
 
 class Formatter:
     def __init__(self, analyzer: Analyzer):
@@ -27,9 +28,8 @@ class Formatter:
         Returns:
             list: A list of words extracted from the specified fields.
         """
-        fields = ["imt_name", "subj_name", "description", "subj_root_name", "contents"]
         words = []
-        for field in fields:
+        for field in PRODUCT_FIELDS:
             words.extend(data.get(field, "").split())
         return words
 
@@ -76,8 +76,7 @@ class Formatter:
         Returns:
             bool: True if the URL matches the pattern, False otherwise.
         """
-        pattern = r"^https://www\.wildberries\.ru/catalog/\d+/detail\.aspx$"
-        return bool(re.match(pattern, url))
+        return bool(re.match(CATALOG_URL_PATTERN, url))
 
     def extract_nmid_from_url(self, url: str) -> int:
         return int(url.split("/")[-2])

@@ -1,4 +1,5 @@
 import pymorphy2
+from constants import VALID_PARTS_OF_SPEECH
 
 
 class Analyzer:
@@ -42,5 +43,4 @@ class Analyzer:
             bool: True if the word is meaningful, False otherwise.
         """
         parsed = self.morph.parse(word)
-        valid_pos = {"NOUN", "ADJF", "ADJS", "NUMR", "VERB", "INFN", "PRTF", "PRTS", "GRND", "ADVB"}
-        return all(p.tag.POS in valid_pos for p in parsed if p.tag.POS is not None)
+        return all(p.tag.POS in VALID_PARTS_OF_SPEECH for p in parsed if p.tag.POS is not None)
