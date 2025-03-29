@@ -1,6 +1,9 @@
 import requests
 import re
 import pymorphy2
+from math import log10
+from time import sleep
+from random import randint
 
 morph = pymorphy2.MorphAnalyzer()
 
@@ -8,11 +11,19 @@ def get_api_endpoint(nmId: int) -> str:
     """
     Generate the API endpoint URL for a given nmId.
 
+    The generated URL follows the format:
+    "https://basket-{}.wbbasket.ru/vol{}/part{}/{}/info/ru/card.json".
+
+    - `{}` (basket number): Determined by the index of the range in which `nmId` falls.
+    - `{}` (vol): Calculated based on the first `slice_range` digits of `nmId`.
+    - `{}` (part): Calculated based on the first `slice_range + 2` digits of `nmId`.
+    - `{}` (full nmId): The full `nmId` value.
+
     Args:
         nmId (int): The unique identifier of the item.
 
     Returns:
-        str: The API endpoint URL for the item.
+        str: The API endpoint URL for the item, or None if `nmId` does not fall within any range.
     """
     ranges = [
         (0, 14399999),
@@ -43,10 +54,13 @@ def get_api_endpoint(nmId: int) -> str:
     ]
 
     url = "https://basket-{}.wbbasket.ru/vol{}/part{}/{}/info/ru/card.json"
-
+    slice_range = int(log10(nmId)) - 4
     for idx, (a, b) in enumerate(ranges):
         if a <= nmId <= b:
-            return url.format(str(idx + 1).zfill(2), str(nmId)[:2], str(nmId)[:4], nmId)
+            return url.format(str(idx + 1).zfill(2),
+                              str(nmId)[:slice_range],
+                              str(nmId)[:2 + slice_range],
+                              nmId)
     return None
 
 
@@ -92,8 +106,10 @@ def get_card(nmId: int) -> dict:
     url = get_api_endpoint(nmId)
     if url is None:
         return None
-    response = requests.get(url).json()
-    return response
+    req = requests.get(url)
+    if req.status_code // 200 == 1:
+        return req.json()
+    return None
 
 def get_tags(card: dict) -> list:
     """
