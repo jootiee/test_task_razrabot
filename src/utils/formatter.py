@@ -1,8 +1,9 @@
 import re
+from utils import Analyzer
 
 class Formatter:
-    def __init__(self):
-        pass
+    def __init__(self, analyzer: Analyzer):
+        self.analyzer = analyzer
 
     def format_string(self, string: str) -> str:
         """
@@ -64,3 +65,19 @@ class Formatter:
             list[str]: A list of nmIds extracted from the products dictionary.
         """
         return [product["id"] for product in products]
+
+    def is_valid_url(self, url: str) -> bool:
+        """
+        Validate if the given URL matches the Wildberries product URL pattern.
+
+        Args:
+            url (str): The URL to validate.
+
+        Returns:
+            bool: True if the URL matches the pattern, False otherwise.
+        """
+        pattern = r"^https://www\.wildberries\.ru/catalog/\d+/detail\.aspx$"
+        return bool(re.match(pattern, url))
+
+    def extract_nmid_from_url(self, url: str) -> int:
+        return int(url.split("/")[-2])

@@ -2,7 +2,7 @@ import requests
 from math import log10
 
 from utils import Analyzer, Formatter 
-from utils.config import proxies
+from config import proxies
 
 class WBApi:
     def __init__(self, analyzer: Analyzer, proxies=None):
@@ -82,7 +82,7 @@ class WBApi:
         Returns:
             dict: The JSON response containing item data.
         """
-        url = WBApi.get_api_endpoint(nmId)
+        url = self.get_api_endpoint(nmId)
         if url is None:
             return None
         req = requests.get(url, proxies=self.proxies)
