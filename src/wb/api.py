@@ -64,6 +64,16 @@ class WBApi:
 
     
     def get_products_by_query(self, query: str, page=1) -> list[dict]:
+        """
+        Fetch products from Wildberries search API based on a search query.
+        
+        Args:
+            query (str): The search term to query for products.
+            page (int, optional): Page number of the search results. Defaults to 1.
+            
+        Returns:
+            list[dict]: A list of product dictionaries, or None if the request fails.
+        """
         url = SEARCH_URL_TEMPLATE.format(page, query)
         req = requests.get(url, proxies=self.proxies)
         if req.status_code // 200 == 1:
@@ -71,15 +81,20 @@ class WBApi:
         return None
 
     def get_position_in_search(self, nm_id: int, tag: str) -> tuple[int, int]:
-        found = False
-        i = 1
-
-        while not found:
-            try:
-                products = self.get_products_by_query(tag, page=i)
-                for j, product in enumerate(products):
-                    if product['id'] == nm_id:
-                        return (i, j + 1)
-                i += 1
-            except Exception as e:
-                return (-1, -1)
+        """
+        Find the position of a product in search results at pages 1-60 (61st is not available).
+        
+        Args:
+            nm_id (int): The product ID to search for.
+            tag (str): The search term to use.
+            
+        Returns:
+            tuple[int, int]: A tuple of (page number, position on page),
+                             or (-1, -1) if the product is not found.
+        """
+        for page in range(1, 61):
+            products = self.get_products_by_query(tag, page=page)
+            for position, product in enumerate(products):
+                if product['id'] == nm_id:
+                    return (page, position + 1)
+        return (-1, -1)

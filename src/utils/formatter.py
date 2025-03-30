@@ -56,13 +56,13 @@ class Formatter:
 
     def extract_ids_from_products(self, products: dict) -> list[str]:
         """
-        Extract nmIds from the products dictionary.
+        Extract nm_ids from the products dictionary.
 
         Args:
             products (dict): The dictionary containing product data.
 
         Returns:
-            list[str]: A list of nmIds extracted from the products dictionary.
+            list[str]: A list of nm_ids extracted from the products dictionary.
         """
         return [product["id"] for product in products]
 
@@ -78,5 +78,14 @@ class Formatter:
         """
         return bool(re.match(CATALOG_URL_PATTERN, url))
 
-    def extract_nmid_from_url(self, url: str) -> int:
+    def extract_nm_id_from_url(self, url: str) -> int:
+        """
+        Extract the numeric product ID (nm_id) from a Wildberries product URL.
+        
+        Args:
+            url (str): The Wildberries product URL.
+            
+        Returns:
+            int: The extracted product ID as an integer.
+        """
         return int(url.split("/")[-2])
